@@ -1,4 +1,7 @@
 from Command.BaseCommand import BaseCommand
+from Command.CommandProvider import CommandProvider
+
+ActiveProvider = CommandProvider()
 
 
 class NotAuthorizedException(Exception):
