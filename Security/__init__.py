@@ -1,9 +1,12 @@
 import os
+import base64
 
 from enum import unique, IntEnum
 
+from cryptography.exceptions import InvalidKey
 from cryptography.hazmat.primitives.hashes import SHA512
 from cryptography.hazmat.primitives.kdf.hkdf import HKDF
+from cryptography.hazmat.primitives.kdf.scrypt import Scrypt
 from cryptography.hazmat.backends import default_backend
 
 
@@ -28,7 +31,42 @@ class Helpers:
         return intermediate_integer % max_value
 
     @staticmethod
-    def derive_key(shared_secret, key_size=32):
+    def derive_key_for_storage(secret_key):
+        if type(secret_key) is str:
+            secret_key = bytes(secret_key, "utf-8")
+        salt = os.urandom(32)
+        kdf = Scrypt(
+            salt=salt,
+            length=64,
+            n=2**7,
+            r=8,
+            p=1,
+            backend=default_backend()
+        )
+        storable_key = kdf.derive(secret_key)
+        return f"{base64.b64encode(salt)}:{base64.b64encode(storable_key)}"
+
+    @staticmethod
+    def provided_password_matches_stored_key(provided_password, stored_key):
+        if type(provided_password) is str:
+            provided_password = bytes(provided_password, "utf-8")
+        salt, stored_key = stored_key.split(":")
+        kdf = Scrypt(
+            salt=base64.b64decode(salt),
+            length=64,
+            n=2**7,
+            r=8,
+            p=1,
+            backend=default_backend()
+        )
+        try:
+            kdf.verify(provided_password, base64.b64decode(stored_key))
+            return True
+        except InvalidKey:
+            return False
+
+    @staticmethod
+    def derive_key(shared_secret, key_size=32, salt=None):
         if type(shared_secret) is int:
             shared_secret = str(shared_secret)
         if type(shared_secret) is str:
@@ -36,7 +74,7 @@ class Helpers:
         return HKDF(
             algorithm=SHA512(),
             length=key_size,
-            salt=None,
+            salt=salt,
             info=b'handshake data',
             backend=default_backend()
         ).derive(shared_secret)

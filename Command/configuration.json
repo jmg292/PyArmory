@@ -1,0 +1,28 @@
+{
+  "home_folder": "/opt/PyArmory",
+  "key_storage_file": "keys/StoredKeys.bin",
+  "temp_storage_location": "/mnt/tmp",
+  "storage_volume": "/dev/mmcblk0p2",
+  "totp_token": "",
+  "totp_count": 0,
+  "plugin_data_dir": "plugin_data",
+  "enabled_plugins": {
+    "authentication": {
+      "auth_file": "keys/authentication.json"
+    },
+    "mount": {
+      "root_mount_point": "/mnt"
+    },
+    "drive_info": {
+      "storage_file": "drive_info.json"
+    },
+    "drive_utility": {
+      "volume_storage": "/mnt/volume_storage",
+      "supported_filesystem_formats": {
+        "ext4": "mkfs.ext4",
+        "ntfs": "mkfs.ntfs",
+        "fat": "mkfs.vfat"
+      }
+    }
+  }
+}

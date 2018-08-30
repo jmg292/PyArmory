@@ -1,5 +1,6 @@
 from Security import AccessLevels
 from Command import NotAuthorizedException
+from Configuration.BaseConfiguration import BaseConfiguration
 
 
 class CommandProvider(object):
@@ -9,22 +10,27 @@ class CommandProvider(object):
         self._uninitialized_commands = {}
         self._registered_configurations = {}
         self._uninitialized_configurations = {}
-        self._current_access_level = AccessLevels.NotAuthenticated
+        self.current_access_level = AccessLevels.NotAuthenticated
 
     def initialize(self):
         for command_name in self._uninitialized_commands:
-            command = self._uninitialized_commands[command_name]()
-            command.initialize(self)
-            self._registered_commands[command_name] = command
+            if command_name in self._registered_configurations:  # Ensure only enabled plugins are initialized
+                command = self._uninitialized_commands[command_name]()
+                command.initialize(self)
+                self._registered_commands[command_name] = command
+
+    def update_configuration(self, initialized_config_object: BaseConfiguration):
+        self._registered_configurations[initialized_config_object.command_name()] = initialized_config_object
 
     def initialize_configuration(self, initialized_config_object):
-        self._uninitialized_configurations[initialized_config_object.command_name()] = initialized_config_object
+        initialized_config_object.on_init(self)
+        self.update_configuration(initialized_config_object)
 
-    def resolve_configuration(self, command_name):
+    def resolve_configuration(self, command_name: str) -> BaseConfiguration:
         if command_name in self._registered_configurations:
             return self._registered_configurations[command_name]
 
-    def get_config_object_for_command(self, command_name):
+    def get_config_object_for_command(self, command_name: str) -> BaseConfiguration:
         if command_name in self._uninitialized_configurations:
             return self._uninitialized_configurations[command_name]
 

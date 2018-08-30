@@ -26,8 +26,8 @@ class CommandDispatcher(object):
 
     @staticmethod
     async def parse_command(command_string: str) -> List:
-        command_array = command_string.lower().split()
-        command = command_array[0]
+        command_array = command_string.split()
+        command = command_array[0].lower()
         command_array.pop(0)
         return [command, command_array]
 
