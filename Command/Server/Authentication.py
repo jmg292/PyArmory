@@ -56,6 +56,8 @@ class AuthenticationCommand(BaseCommand):
                             derived_key = Helpers.derive_key(args[1], auth_config.stored_keys[auth_level_requested]["salt"])
                             auth_config.unlocked_keys[auth_level_requested] = derived_key
                             auth_config.update()
+                            if auth_level_requested < Command.ActiveProvider.current_access_level:
+                                Command.ActiveProvider.current_access_level = auth_level_requested
                             return_value = "1"
         except ValueError:
             pass
