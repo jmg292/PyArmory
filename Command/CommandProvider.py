@@ -10,7 +10,7 @@ class CommandProvider(object):
         self._uninitialized_commands = {}
         self._registered_configurations = {}
         self._uninitialized_configurations = {}
-        self.current_access_level = AccessLevels.NotAuthenticated
+        self.current_access_level = AccessLevels.Locked
 
     def initialize(self):
         for command_name in self._uninitialized_commands:
@@ -46,7 +46,7 @@ class CommandProvider(object):
         return_value = ""
         if command_name in self._registered_commands:
             command_object = self._registered_commands[command_name]
-            if command_object.minimum_access_level() < self._current_access_level:
+            if command_object.minimum_access_level() < self.current_access_level:
                 return_value = str(NotAuthorizedException(command_object))
             else:
                 return_value = command_object.execute(*args)

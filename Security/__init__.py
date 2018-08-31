@@ -17,6 +17,7 @@ class AccessLevels(IntEnum):
     Privileged = 1
     Unprivileged = 2
     NotAuthenticated = 3
+    Locked = 4
 
 
 class Helpers:
@@ -47,9 +48,9 @@ class Helpers:
         return f"{base64.b64encode(salt)}:{base64.b64encode(storable_key)}"
 
     @staticmethod
-    def provided_password_matches_stored_key(provided_password, stored_key):
-        if type(provided_password) is str:
-            provided_password = bytes(provided_password, "utf-8")
+    def keys_match(provided_key, stored_key):
+        if type(provided_key) is str:
+            provided_password = bytes(provided_key, "utf-8")
         salt, stored_key = stored_key.split(":")
         kdf = Scrypt(
             salt=base64.b64decode(salt),
@@ -60,7 +61,7 @@ class Helpers:
             backend=default_backend()
         )
         try:
-            kdf.verify(provided_password, base64.b64decode(stored_key))
+            kdf.verify(provided_key, base64.b64decode(stored_key))
             return True
         except InvalidKey:
             return False

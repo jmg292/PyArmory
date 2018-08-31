@@ -27,7 +27,6 @@ class ConfigurationObject(BaseConfiguration):
     def load_dictionary(self, config_dictionary):
         validate_set = [
             "home_folder",
-            "key_storage_file",
             "storage_volume"
             "temp_storage_location",
             "enabled_plugins",
@@ -38,7 +37,6 @@ class ConfigurationObject(BaseConfiguration):
                 raise KeyError(f"Required key is missing from configuration: {setting_name}")
         self.home_folder = config_dictionary["home_folder"]
         self.storage_volume = config_dictionary["storage_volume"]
-        self.key_storage_file = config_dictionary["key_storage_file"]
         self.temp_storage_location = config_dictionary["temp_storage_location"]
         self.plugin_data_dir = config_dictionary["plugin_data_dir"]
         Command.ActiveProvider.initialize_configuration(self)
