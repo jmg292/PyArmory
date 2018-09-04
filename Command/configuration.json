@@ -4,6 +4,11 @@
   "storage_volume": "/dev/mmcblk0p2",
   "plugin_data_dir": "plugin_data",
   "enabled_plugins": {
+    "temp_manager": {
+      "temp_size": "64MB",
+      "volume_storage": "/tmp",
+      "temp_storage_location": "/mnt/tmp"
+    },
     "authentication": {
       "auth_file_path": "keys/authentication.json"
     },

@@ -15,6 +15,7 @@ class DriveUtilityConfig(BaseConfiguration):
 
     def __init__(self):
         super().__init__()
+        self._for_command = "temp_manager"
         self.volume_storage = ""
         self.supported_filesystem_formats = {}
 
@@ -44,7 +45,7 @@ class DriveUtility(BaseCommand):
         return storage_volume_stats.f_frsize * storage_volume_stats.f_bfree
 
     @staticmethod
-    def _convert_string_to_bytes(input_string: str):
+    def convert_string_to_bytes(input_string: str):
         units = {
             "B": 1,
             "KB": 10 ** 3,
@@ -103,7 +104,7 @@ class DriveUtility(BaseCommand):
     def _can_create_drive(self, alias, size, required_access_level, fs_format):
         operation_successful = False
         space_remaining = self._get_free_space_bytes()
-        space_requested = self._convert_string_to_bytes(size)
+        space_requested = self.convert_string_to_bytes(size)
         if space_requested and space_requested <= space_remaining:
             drive_info = Command.ActiveProvider.resolve_configuration("drive_info")
             if alias not in drive_info.drive_information:
@@ -116,7 +117,7 @@ class DriveUtility(BaseCommand):
         creation_successful = False
         volume_path = os.path.join(self._command_config.volume_storage, uuid.uuid4().hex)
         if not os.path.exists(volume_path):
-            size = self._convert_string_to_bytes(size)
+            size = self.convert_string_to_bytes(size)
             dd = subprocess.Popen(["dd", "if=/dev/urandom", f"of={volume_path}", "bs=1B", f"count={size}"],
                                   stdout=subprocess.PIPE, stderr=subprocess.PIPE)
             dd.communicate()
